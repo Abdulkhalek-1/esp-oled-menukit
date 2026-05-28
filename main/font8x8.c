@@ -21,6 +21,10 @@
 
 #include "font8x8.h"
 
+#include <stddef.h>
+
+_Static_assert(sizeof(font8x8) == (size_t)96 * 8, "font8x8 must be 96 glyphs of 8 bytes");
+
 // clang-format off
 const uint8_t font8x8[96][8] = {
     /* 0x20  '?' */ {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},

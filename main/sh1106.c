@@ -17,9 +17,12 @@
 #define PIN_DC 18
 #define PIN_RES 4
 
-#define SH1106_PAGES (SH1106_HEIGHT / 8) // 8 pages of 8 rows each.
-#define SH1106_FB_SIZE (SH1106_WIDTH * SH1106_PAGES)
+#define SH1106_PAGES      (SH1106_HEIGHT / 8) // 8 pages of 8 rows each.
+#define SH1106_FB_SIZE    (SH1106_WIDTH * SH1106_PAGES)
 #define SH1106_COL_OFFSET 2 // SH1106 has 132 columns; visible area starts at 2.
+
+_Static_assert(SH1106_PAGES * 8 == SH1106_HEIGHT, "page count must match height");
+_Static_assert(SH1106_FB_SIZE == SH1106_WIDTH * SH1106_PAGES, "framebuffer size mismatch");
 
 static uint8_t             framebuffer[SH1106_FB_SIZE];
 static spi_device_handle_t dev;
