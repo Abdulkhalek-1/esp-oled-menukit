@@ -4,10 +4,15 @@
 
 #include "esp_log.h"
 
+static void act_brightness(void *ctx) { (void)ctx; menu_toast("Brightness +", 600); }
+static void act_contrast  (void *ctx) { (void)ctx; menu_toast("Contrast +",   600); }
+static void act_reset     (void *ctx) { (void)ctx; menu_toast("Reset!",       600); }
+static void act_about     (void *ctx) { (void)ctx; menu_toast("v0.1",         600); }
+
 static const menu_item_t settings_items[] = {
-    { .kind = MENU_ITEM_ACTION, .label = "Brightness" },
-    { .kind = MENU_ITEM_ACTION, .label = "Contrast" },
-    { .kind = MENU_ITEM_ACTION, .label = "Reset" },
+    { .kind = MENU_ITEM_ACTION, .label = "Brightness", .u.action = act_brightness },
+    { .kind = MENU_ITEM_ACTION, .label = "Contrast",   .u.action = act_contrast },
+    { .kind = MENU_ITEM_ACTION, .label = "Reset",      .u.action = act_reset },
     MENU_END,
 };
 static const menu_t settings_menu = {
@@ -16,7 +21,7 @@ static const menu_t settings_menu = {
 
 static const menu_item_t home_items[] = {
     { .kind = MENU_ITEM_SUBMENU, .label = "Settings", .u.submenu = &settings_menu },
-    { .kind = MENU_ITEM_ACTION,  .label = "About" },
+    { .kind = MENU_ITEM_ACTION,  .label = "About",    .u.action = act_about },
     MENU_END,
 };
 static const menu_t home = {

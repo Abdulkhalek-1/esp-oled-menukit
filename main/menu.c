@@ -140,6 +140,9 @@ void menu_handle_event(button_event_t evt)
                 s_stack[s_depth].scroll_offset = 0;
                 s_depth++;
                 changed = true;
+            } else if (it->kind == MENU_ITEM_ACTION && it->u.action != NULL) {
+                it->u.action(s_user_ctx);
+                changed = true;
             }
         }
         break;
@@ -167,4 +170,12 @@ void menu_run_task(QueueHandle_t q, UBaseType_t priority)
 }
 
 void menu_redraw(void) { render(); }
-void menu_toast(const char *msg, int duration_ms) { (void)msg; (void)duration_ms; }
+
+void menu_toast(const char *msg, int duration_ms)
+{
+    invert_rect(0, SH1106_HEIGHT - 10, SH1106_WIDTH, 10);
+    draw_string_inverse(2, SH1106_HEIGHT - 9, msg);
+    sh1106_flush();
+    vTaskDelay(pdMS_TO_TICKS(duration_ms));
+    render();
+}
