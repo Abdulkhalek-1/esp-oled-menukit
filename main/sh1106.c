@@ -79,6 +79,23 @@ void sh1106_init(void)
         .queue_size = 1,
     };
     spi_bus_add_device(SPI2_HOST, &devcfg, &dev);
+
+    // 5. SH1106 power-on init sequence.
+    sh1106_cmd(0xAE);              // display off
+    sh1106_cmd(0xD5); sh1106_cmd(0x80);  // clock divide ratio / oscillator freq
+    sh1106_cmd(0xA8); sh1106_cmd(0x3F);  // multiplex ratio = 64
+    sh1106_cmd(0xD3); sh1106_cmd(0x00);  // display offset = 0
+    sh1106_cmd(0x40);              // display start line = 0
+    sh1106_cmd(0xAD); sh1106_cmd(0x8B);  // DC-DC charge pump ON (SH1106-specific; do NOT use SSD1306's 0x8D 0x14)
+    sh1106_cmd(0xA1);              // segment remap: column 127 -> SEG0
+    sh1106_cmd(0xC8);              // COM scan direction: remapped (top-to-bottom flipped)
+    sh1106_cmd(0xDA); sh1106_cmd(0x12);  // COM pins hardware config
+    sh1106_cmd(0x81); sh1106_cmd(0x80);  // contrast = 128/255
+    sh1106_cmd(0xD9); sh1106_cmd(0x22);  // pre-charge period
+    sh1106_cmd(0xDB); sh1106_cmd(0x35);  // VCOMH deselect level
+    sh1106_cmd(0xA4);              // resume to RAM content (not all-on)
+    sh1106_cmd(0xA6);              // normal display (not inverted)
+    sh1106_cmd(0xAF);              // display on
 }
 
 void sh1106_clear(void) { memset(framebuffer, 0, sizeof(framebuffer)); }
