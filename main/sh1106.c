@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include "font8x8.h"
+
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include "esp_rom_sys.h"
@@ -122,7 +124,26 @@ void sh1106_flush(void)
     }
 }
 
+static void draw_char(int x, int y, char c)
+{
+    unsigned char uc = (unsigned char)c;
+    if (uc < 32 || uc > 127) uc = '?';
+    const uint8_t *glyph = font8x8[uc - 32];
+
+    for (int col = 0; col < 8; col++) {
+        uint8_t bits = glyph[col];      // one column of the glyph
+        for (int row = 0; row < 8; row++) {
+            if (bits & (1 << row)) {    // LSB = top, so bit `row` = pixel row
+                sh1106_set_pixel(x + col, y + row, true);
+            }
+        }
+    }
+}
+
 void sh1106_draw_string(int x, int y, const char *s)
 {
-    (void)x; (void)y; (void)s;
+    while (*s) {
+        draw_char(x, y, *s++);
+        x += 8;
+    }
 }
