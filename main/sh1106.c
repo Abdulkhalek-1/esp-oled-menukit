@@ -44,7 +44,7 @@ static void sh1106_data(const uint8_t *buf, size_t len)
     spi_device_polling_transmit(dev, &t);
 }
 
-void sh1106_init(void)
+esp_err_t sh1106_init(void)
 {
     // 1. Configure RES and DC as outputs.
     gpio_config_t io = {
@@ -54,7 +54,8 @@ void sh1106_init(void)
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type    = GPIO_INTR_DISABLE,
     };
-    gpio_config(&io);
+    esp_err_t err = gpio_config(&io);
+    if (err != ESP_OK) return err;
 
     // 2. Pulse RES low → high to reset the controller.
     gpio_set_level(PIN_RES, 0);
@@ -71,7 +72,8 @@ void sh1106_init(void)
         .quadhd_io_num   = -1,
         .max_transfer_sz = SH1106_WIDTH, // one page at a time
     };
-    spi_bus_initialize(SPI2_HOST, &bus, SPI_DMA_CH_AUTO);
+    err = spi_bus_initialize(SPI2_HOST, &bus, SPI_DMA_CH_AUTO);
+    if (err != ESP_OK) return err;
 
     // 4. Add the OLED as a device on that bus.
     spi_device_interface_config_t devcfg = {
@@ -80,7 +82,8 @@ void sh1106_init(void)
         .spics_io_num   = PIN_CS,          // SPI driver toggles CS
         .queue_size     = 1,
     };
-    spi_bus_add_device(SPI2_HOST, &devcfg, &dev);
+    err = spi_bus_add_device(SPI2_HOST, &devcfg, &dev);
+    if (err != ESP_OK) return err;
 
     // 5. SH1106 power-on init sequence.
     sh1106_cmd(0xAE); // display off
@@ -106,6 +109,8 @@ void sh1106_init(void)
     sh1106_cmd(0xA4); // resume to RAM content (not all-on)
     sh1106_cmd(0xA6); // normal display (not inverted)
     sh1106_cmd(0xAF); // display on
+
+    return ESP_OK;
 }
 
 void sh1106_clear(void)

@@ -157,7 +157,10 @@ static const menu_t home = {
 // ----- Entry point -------------------------------------------------------
 void app_main(void)
 {
-    sh1106_init();
+    if (sh1106_init() != ESP_OK) {
+        ESP_LOGE("main", "sh1106_init failed");
+        return;
+    }
     sh1106_clear();
     sh1106_flush();
 
