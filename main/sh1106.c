@@ -99,7 +99,19 @@ void sh1106_init(void)
 }
 
 void sh1106_clear(void) { memset(framebuffer, 0, sizeof(framebuffer)); }
-void sh1106_set_pixel(int x, int y, bool on) { (void)x; (void)y; (void)on; }
+void sh1106_set_pixel(int x, int y, bool on)
+{
+    if (x < 0 || x >= SH1106_WIDTH)  return;
+    if (y < 0 || y >= SH1106_HEIGHT) return;
+
+    // Page-major framebuffer: each byte holds 8 vertically-stacked pixels of one page.
+    int page = y / 8;
+    int bit  = y % 8;
+    int idx  = page * SH1106_WIDTH + x;
+
+    if (on) framebuffer[idx] |=  (1 << bit);
+    else    framebuffer[idx] &= ~(1 << bit);
+}
 void sh1106_flush(void)
 {
     for (uint8_t page = 0; page < SH1106_PAGES; page++) {
