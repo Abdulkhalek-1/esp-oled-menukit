@@ -27,6 +27,10 @@ static const menu_style_t arrow_style = {
     .icon_w = 32, .icon_h = 32, .row_height = 10, .title_height = 10,
     .selection = MENU_SEL_ARROW,
 };
+static const menu_style_t border_style = {
+    .icon_w = 32, .icon_h = 32, .row_height = 10, .title_height = 10,
+    .selection = MENU_SEL_BORDER,
+};
 static const menu_t long_menu = {
     .title = "Long List", .layout = MENU_LAYOUT_LIST, .items = long_items, .style = &arrow_style,
 };
@@ -38,7 +42,7 @@ static const menu_item_t settings_items[] = {
     MENU_END,
 };
 static const menu_t settings_menu = {
-    .title = "Settings", .layout = MENU_LAYOUT_LIST, .items = settings_items, .style = NULL,
+    .title = "Settings", .layout = MENU_LAYOUT_LIST, .items = settings_items, .style = &border_style,
 };
 
 static const menu_item_t home_items[] = {

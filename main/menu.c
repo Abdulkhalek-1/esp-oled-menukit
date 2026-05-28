@@ -67,6 +67,18 @@ static void draw_string_inverse(int x, int y, const char *s)
     }
 }
 
+static void draw_rect(int x, int y, int w, int h)
+{
+    for (int xx = x; xx < x + w; xx++) {
+        sh1106_set_pixel(xx, y, true);
+        sh1106_set_pixel(xx, y + h - 1, true);
+    }
+    for (int yy = y; yy < y + h; yy++) {
+        sh1106_set_pixel(x, yy, true);
+        sh1106_set_pixel(x + w - 1, yy, true);
+    }
+}
+
 static int draw_title(const menu_t *m)
 {
     const menu_style_t *st = style_of(m);
@@ -107,6 +119,9 @@ static void render_list(const menu_t *m, const frame_t *f_in)
                 sh1106_draw_string(2, y + 1, ">");
             }
             sh1106_draw_string(text_x, y + 1, m->items[i].label);
+            if (selected && st->selection == MENU_SEL_BORDER) {
+                draw_rect(0, y, SH1106_WIDTH, st->row_height);
+            }
         }
         y += st->row_height;
     }
