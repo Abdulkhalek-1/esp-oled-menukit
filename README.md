@@ -1,4 +1,4 @@
-# SH1106-learn
+# esp-oled-menukit
 
 OLED-driven menu system for ESP32 with a 1.3" SH1106 SPI display and three push buttons.
 Built as a set of independent ESP-IDF components, plus a working demo.
@@ -55,7 +55,7 @@ Two equivalent ways:
 1. **EXTRA_COMPONENT_DIRS.** In your other project's root `CMakeLists.txt`, before `project(...)`, add:
 
    ```cmake
-   set(EXTRA_COMPONENT_DIRS "/path/to/SH1106-learn/components")
+   set(EXTRA_COMPONENT_DIRS "/path/to/esp-oled-menukit/components")
    ```
 
    Then list the components you want in your `main/CMakeLists.txt`:
@@ -67,7 +67,7 @@ Two equivalent ways:
 2. **Copy.** Copy the component folders into your project's own `components/` tree:
 
    ```bash
-   cp -r SH1106-learn/components/{font8x8,sh1106,buttons,menu} my-project/components/
+   cp -r esp-oled-menukit/components/{font8x8,sh1106,buttons,menu} my-project/components/
    ```
 
 Each component is fully self-contained — its `CMakeLists.txt` declares its own dependencies via `REQUIRES` / `PRIV_REQUIRES`.
