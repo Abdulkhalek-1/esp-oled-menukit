@@ -34,6 +34,7 @@ static per_btn_t s_state[BTN_COUNT];
 
 static void      emit(button_id_t b, button_event_type_t ev)
 {
+    if (s_queue == NULL) return;
     button_event_t evt = {.button = b, .event = ev};
     if (xQueueSendToBack(s_queue, &evt, 0) != pdTRUE) {
         ESP_LOGW(TAG, "queue full, dropped event b=%d ev=%d", b, ev);

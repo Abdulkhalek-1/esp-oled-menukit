@@ -4,6 +4,7 @@
 #include "font8x8.h"
 #include "sh1106.h"
 
+#include <assert.h>
 #include <string.h>
 
 static const char *TAG = "menu";
@@ -108,7 +109,7 @@ static int draw_title(const menu_t *m)
     return st->title_height;
 }
 
-static void render_list(const menu_t *m, const frame_t *f_in)
+static void render_list(const menu_t *m, frame_t *f)
 {
     const menu_style_t *st           = style_of(m);
     int                 n            = item_count(m->items);
@@ -117,7 +118,6 @@ static void render_list(const menu_t *m, const frame_t *f_in)
     int                 visible_rows = (SH1106_HEIGHT - y_start) / st->row_height;
     if (visible_rows < 1) visible_rows = 1;
 
-    frame_t *f = (frame_t *)f_in;
     if (f->index < f->scroll_offset) f->scroll_offset = f->index;
     if (f->index >= f->scroll_offset + visible_rows) f->scroll_offset = f->index - visible_rows + 1;
 
@@ -142,7 +142,7 @@ static void render_list(const menu_t *m, const frame_t *f_in)
     }
 }
 
-static void render_icons(const menu_t *m, const frame_t *f)
+static void render_icons(const menu_t *m, frame_t *f)
 {
     const menu_style_t *st    = style_of(m);
     int                 n     = item_count(m->items);
@@ -192,7 +192,7 @@ static void render(void)
 {
     if (s_depth == 0) return;
     sh1106_clear();
-    const frame_t *f = &s_stack[s_depth - 1];
+    frame_t *f = &s_stack[s_depth - 1];
     if (f->menu->layout == MENU_LAYOUT_LIST) {
         render_list(f->menu, f);
     } else if (f->menu->layout == MENU_LAYOUT_ICONS) {
@@ -203,6 +203,7 @@ static void render(void)
 
 void menu_init(const menu_t *root, void *user_ctx)
 {
+    assert(root != NULL);
     s_user_ctx               = user_ctx;
     s_depth                  = 1;
     s_stack[0].menu          = root;
