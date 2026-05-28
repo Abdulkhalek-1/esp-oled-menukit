@@ -20,6 +20,7 @@ typedef enum {
     ST_IDLE,            // pin high, waiting for press
     ST_DEBOUNCE_PRESS,  // pin low, counting samples toward debounce_ms
     ST_PRESSED,         // press confirmed
+    ST_LONG_HELD,       // long-press fired; repeats will come in Task 4
     ST_DEBOUNCE_REL,    // pin high, counting samples toward debounce_ms
 } btn_state_t;
 
@@ -68,7 +69,18 @@ static void buttons_task(void *arg)
                 if (!low) {
                     st->state = ST_DEBOUNCE_REL;
                     st->ms_in_state = 0;
+                } else if (st->ms_in_state >= s_cfg.long_press_ms) {
+                    emit((button_id_t)b, BTN_EVT_LONG_PRESS);
+                    st->state = ST_LONG_HELD;
+                    st->ms_in_state = 0;
                 }
+                break;
+            case ST_LONG_HELD:
+                if (!low) {
+                    st->state = ST_DEBOUNCE_REL;
+                    st->ms_in_state = 0;
+                }
+                // REPEAT events come in Task 4.
                 break;
             case ST_DEBOUNCE_REL:
                 if (low) {
