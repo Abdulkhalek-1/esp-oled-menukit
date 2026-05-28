@@ -125,10 +125,23 @@ void menu_handle_event(button_event_t evt)
         changed = true;
         break;
     case BTN_BACK:
-        f->index = (f->index - 1 + n) % n;
-        changed = true;
+        if (s_depth > 1) {
+            s_depth--;
+            changed = true;
+        }
         break;
     case BTN_ENTER:
+        if (evt.event == BTN_EVT_REPEAT) break;
+        {
+            const menu_item_t *it = &f->menu->items[f->index];
+            if (it->kind == MENU_ITEM_SUBMENU && s_depth < MENU_MAX_DEPTH) {
+                s_stack[s_depth].menu          = it->u.submenu;
+                s_stack[s_depth].index         = 0;
+                s_stack[s_depth].scroll_offset = 0;
+                s_depth++;
+                changed = true;
+            }
+        }
         break;
     default:
         break;
