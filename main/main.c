@@ -23,8 +23,12 @@ static const menu_item_t long_items[] = {
     { .kind = MENU_ITEM_ACTION, .label = "Item 10", .u.action = act_log },
     MENU_END,
 };
+static const menu_style_t arrow_style = {
+    .icon_w = 32, .icon_h = 32, .row_height = 10, .title_height = 10,
+    .selection = MENU_SEL_ARROW,
+};
 static const menu_t long_menu = {
-    .title = "Long List", .layout = MENU_LAYOUT_LIST, .items = long_items, .style = NULL,
+    .title = "Long List", .layout = MENU_LAYOUT_LIST, .items = long_items, .style = &arrow_style,
 };
 
 static const menu_item_t settings_items[] = {

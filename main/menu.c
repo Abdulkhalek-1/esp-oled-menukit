@@ -97,11 +97,16 @@ static void render_list(const menu_t *m, const frame_t *f_in)
     int y = y_start;
     for (int i = f->scroll_offset; i < n && i < f->scroll_offset + visible_rows; i++) {
         bool selected = (i == f->index);
+        int text_x = (st->selection == MENU_SEL_ARROW) ? 10 : 2;
+
         if (selected && st->selection == MENU_SEL_INVERT) {
             invert_rect(0, y, SH1106_WIDTH, st->row_height);
-            draw_string_inverse(2, y + 1, m->items[i].label);
+            draw_string_inverse(text_x, y + 1, m->items[i].label);
         } else {
-            sh1106_draw_string(2, y + 1, m->items[i].label);
+            if (selected && st->selection == MENU_SEL_ARROW) {
+                sh1106_draw_string(2, y + 1, ">");
+            }
+            sh1106_draw_string(text_x, y + 1, m->items[i].label);
         }
         y += st->row_height;
     }
