@@ -67,6 +67,22 @@ static void draw_string_inverse(int x, int y, const char *s)
     }
 }
 
+static void render_icon(int x, int y, const uint8_t *icon, int w, int h)
+{
+    if (icon == NULL) return;
+    int pages = h / 8;
+    for (int page = 0; page < pages; page++) {
+        for (int col = 0; col < w; col++) {
+            uint8_t bits = icon[page * w + col];
+            for (int row = 0; row < 8; row++) {
+                if (bits & (1 << row)) {
+                    sh1106_set_pixel(x + col, y + page * 8 + row, true);
+                }
+            }
+        }
+    }
+}
+
 static void draw_rect(int x, int y, int w, int h)
 {
     for (int xx = x; xx < x + w; xx++) {
@@ -146,6 +162,14 @@ void menu_init(const menu_t *root, void *user_ctx)
     s_stack[0].index         = 0;
     s_stack[0].scroll_offset = 0;
     ESP_LOGI(TAG, "menu_init: root=%p", root);
+
+    // Task 9 smoke test for render_icon — remove in Task 10.
+    extern const uint8_t icon_test[128];
+    sh1106_clear();
+    render_icon(48, 16, icon_test, 32, 32);
+    sh1106_flush();
+    vTaskDelay(pdMS_TO_TICKS(1500));
+
     render();
 }
 
