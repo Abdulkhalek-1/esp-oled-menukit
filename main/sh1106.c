@@ -22,6 +22,26 @@
 static uint8_t framebuffer[SH1106_FB_SIZE];
 static spi_device_handle_t dev;
 
+static void sh1106_cmd(uint8_t c)
+{
+    gpio_set_level(PIN_DC, 0);  // 0 = command
+    spi_transaction_t t = {
+        .length = 8,            // bits, not bytes
+        .tx_buffer = &c,
+    };
+    spi_device_polling_transmit(dev, &t);
+}
+
+static void sh1106_data(const uint8_t *buf, size_t len)
+{
+    gpio_set_level(PIN_DC, 1);  // 1 = data
+    spi_transaction_t t = {
+        .length = len * 8,      // bits
+        .tx_buffer = buf,
+    };
+    spi_device_polling_transmit(dev, &t);
+}
+
 void sh1106_init(void)
 {
     // 1. Configure RES and DC as outputs.
