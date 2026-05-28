@@ -15,10 +15,10 @@
 |----------|-------------|--------------------------------|
 | GND      | GND         |                                |
 | VCC      | 3V3         |                                |
-| D0 (SCK) | GPIO 18     | HSPI SCK                       |
-| D1 (MOSI)| GPIO 23     | HSPI MOSI                      |
-| RES      | GPIO 16     | Manual GPIO, active low        |
-| DC       | GPIO 17     | Manual GPIO; 0 = cmd, 1 = data |
+| D0 (SCK) | GPIO 15     | HSPI SCK                       |
+| D1 (MOSI)| GPIO 2      | HSPI MOSI                      |
+| RES      | GPIO 4      | Manual GPIO, active low        |
+| DC       | GPIO 18     | Manual GPIO; 0 = cmd, 1 = data |
 | CS       | GPIO 5      | Driven by `spi_master` driver  |
 
 SPI clock starts at 8 MHz (conservative; SH1106 datasheet allows higher, we can push later).
