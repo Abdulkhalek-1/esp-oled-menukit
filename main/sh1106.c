@@ -121,3 +121,8 @@ void sh1106_flush(void)
         sh1106_data(&framebuffer[page * SH1106_WIDTH], SH1106_WIDTH);
     }
 }
+
+void sh1106_draw_string(int x, int y, const char *s)
+{
+    (void)x; (void)y; (void)s;
+}
