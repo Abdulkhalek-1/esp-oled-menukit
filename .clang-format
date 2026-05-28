@@ -1,0 +1,30 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+PointerAlignment: Right
+AlignConsecutiveAssignments: AcrossEmptyLines
+AlignConsecutiveDeclarations: AcrossEmptyLines
+AlignTrailingComments: true
+SpaceBeforeParens: ControlStatements
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterStruct: false
+  AfterEnum: false
+  AfterControlStatement: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:    '^"[a-z0-9_]+\.h"$'
+    Priority: 1
+  - Regex:    '^<(stdio|stdint|stdbool|stddef|string|stdlib)\.h>'
+    Priority: 2
+  - Regex:    '^"(freertos|driver|esp_).+\.h"$'
+    Priority: 3
+  - Regex:    '.*'
+    Priority: 4
