@@ -1,6 +1,7 @@
 #include "menu.h"
 
 #include "esp_log.h"
+#include "font8x8.h"
 #include "sh1106.h"
 
 #include <string.h>
@@ -51,7 +52,6 @@ static void invert_rect(int x, int y, int w, int h)
 
 static void draw_string_inverse(int x, int y, const char *s)
 {
-    extern const uint8_t font8x8[96][8];
     while (*s) {
         unsigned char uc = (unsigned char)(*s++);
         if (uc < 32 || uc > 127) uc = '?';
