@@ -79,8 +79,10 @@ static void buttons_task(void *arg)
                 if (!low) {
                     st->state = ST_DEBOUNCE_REL;
                     st->ms_in_state = 0;
+                } else if (st->ms_in_state >= s_cfg.repeat_interval_ms) {
+                    emit((button_id_t)b, BTN_EVT_REPEAT);
+                    st->ms_in_state = 0;
                 }
-                // REPEAT events come in Task 4.
                 break;
             case ST_DEBOUNCE_REL:
                 if (low) {
