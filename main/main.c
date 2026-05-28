@@ -16,7 +16,7 @@ static const menu_item_t settings_items[] = {
     MENU_END,
 };
 static const menu_t settings_menu = {
-    .title = NULL, .layout = MENU_LAYOUT_LIST, .items = settings_items, .style = NULL,
+    .title = "Settings", .layout = MENU_LAYOUT_LIST, .items = settings_items, .style = NULL,
 };
 
 static const menu_item_t home_items[] = {
@@ -25,7 +25,7 @@ static const menu_item_t home_items[] = {
     MENU_END,
 };
 static const menu_t home = {
-    .title = NULL, .layout = MENU_LAYOUT_LIST, .items = home_items, .style = NULL,
+    .title = "Home", .layout = MENU_LAYOUT_LIST, .items = home_items, .style = NULL,
 };
 
 void app_main(void)

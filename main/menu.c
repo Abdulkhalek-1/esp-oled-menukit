@@ -67,11 +67,23 @@ static void draw_string_inverse(int x, int y, const char *s)
     }
 }
 
+static int draw_title(const menu_t *m)
+{
+    const menu_style_t *st = style_of(m);
+    if (m->title == NULL || st->title_height <= 0) return 0;
+
+    sh1106_draw_string(2, 1, m->title);
+    for (int x = 0; x < SH1106_WIDTH; x++) {
+        sh1106_set_pixel(x, st->title_height - 1, true);
+    }
+    return st->title_height;
+}
+
 static void render_list(const menu_t *m, const frame_t *f)
 {
     const menu_style_t *st = style_of(m);
     int n = item_count(m->items);
-    int y = 0;
+    int y = draw_title(m);
     for (int i = 0; i < n; i++) {
         bool selected = (i == f->index);
         if (selected && st->selection == MENU_SEL_INVERT) {
