@@ -1,9 +1,9 @@
 #include "menu.h"
 
-#include <string.h>
-
 #include "esp_log.h"
 #include "sh1106.h"
+
+#include <string.h>
 
 static const char *TAG = "menu";
 
@@ -15,16 +15,16 @@ typedef struct {
     int           scroll_offset;
 } frame_t;
 
-static frame_t  s_stack[MENU_MAX_DEPTH];
-static int      s_depth;
-static void    *s_user_ctx;
+static frame_t            s_stack[MENU_MAX_DEPTH];
+static int                s_depth;
+static void              *s_user_ctx;
 
 static const menu_style_t s_default_style = {
-    .icon_w        = 32,
-    .icon_h        = 32,
-    .row_height    = 10,
-    .title_height  = 10,
-    .selection     = MENU_SEL_INVERT,
+    .icon_w       = 32,
+    .icon_h       = 32,
+    .row_height   = 10,
+    .title_height = 10,
+    .selection    = MENU_SEL_INVERT,
 };
 
 static const menu_style_t *style_of(const menu_t *m)
@@ -35,7 +35,8 @@ static const menu_style_t *style_of(const menu_t *m)
 static int item_count(const menu_item_t *items)
 {
     int n = 0;
-    while (items[n].kind != MENU_ITEM_END) n++;
+    while (items[n].kind != MENU_ITEM_END)
+        n++;
     return n;
 }
 
@@ -109,23 +110,21 @@ static int draw_title(const menu_t *m)
 
 static void render_list(const menu_t *m, const frame_t *f_in)
 {
-    const menu_style_t *st = style_of(m);
-    int n = item_count(m->items);
+    const menu_style_t *st           = style_of(m);
+    int                 n            = item_count(m->items);
 
-    int y_start = draw_title(m);
-    int visible_rows = (SH1106_HEIGHT - y_start) / st->row_height;
+    int                 y_start      = draw_title(m);
+    int                 visible_rows = (SH1106_HEIGHT - y_start) / st->row_height;
     if (visible_rows < 1) visible_rows = 1;
 
     frame_t *f = (frame_t *)f_in;
-    if (f->index < f->scroll_offset)
-        f->scroll_offset = f->index;
-    if (f->index >= f->scroll_offset + visible_rows)
-        f->scroll_offset = f->index - visible_rows + 1;
+    if (f->index < f->scroll_offset) f->scroll_offset = f->index;
+    if (f->index >= f->scroll_offset + visible_rows) f->scroll_offset = f->index - visible_rows + 1;
 
     int y = y_start;
     for (int i = f->scroll_offset; i < n && i < f->scroll_offset + visible_rows; i++) {
         bool selected = (i == f->index);
-        int text_x = (st->selection == MENU_SEL_ARROW) ? 10 : 2;
+        int  text_x   = (st->selection == MENU_SEL_ARROW) ? 10 : 2;
 
         if (selected && st->selection == MENU_SEL_INVERT) {
             invert_rect(0, y, SH1106_WIDTH, st->row_height);
@@ -145,10 +144,10 @@ static void render_list(const menu_t *m, const frame_t *f_in)
 
 static void render_icons(const menu_t *m, const frame_t *f)
 {
-    const menu_style_t *st = style_of(m);
-    int n = item_count(m->items);
+    const menu_style_t *st    = style_of(m);
+    int                 n     = item_count(m->items);
 
-    int y_top = 0;
+    int                 y_top = 0;
     if (m->title) y_top = draw_title(m);
 
     int total_w = n * st->icon_w;
@@ -204,8 +203,8 @@ static void render(void)
 
 void menu_init(const menu_t *root, void *user_ctx)
 {
-    s_user_ctx = user_ctx;
-    s_depth = 1;
+    s_user_ctx               = user_ctx;
+    s_depth                  = 1;
     s_stack[0].menu          = root;
     s_stack[0].index         = 0;
     s_stack[0].scroll_offset = 0;
@@ -217,19 +216,18 @@ void menu_handle_event(button_event_t evt)
 {
     if (s_depth == 0) return;
     frame_t *f = &s_stack[s_depth - 1];
-    int n = item_count(f->menu->items);
+    int      n = item_count(f->menu->items);
     if (n == 0) return;
 
-    bool changed = false;
-    bool is_press_or_repeat =
-        (evt.event == BTN_EVT_PRESSED) || (evt.event == BTN_EVT_REPEAT);
+    bool changed            = false;
+    bool is_press_or_repeat = (evt.event == BTN_EVT_PRESSED) || (evt.event == BTN_EVT_REPEAT);
 
     if (!is_press_or_repeat) return;
 
     switch (evt.button) {
     case BTN_FORWARD:
         f->index = (f->index + 1) % n;
-        changed = true;
+        changed  = true;
         break;
     case BTN_BACK:
         if (s_depth > 1) {
@@ -262,7 +260,7 @@ void menu_handle_event(button_event_t evt)
 
 static void menu_run_task_fn(void *arg)
 {
-    QueueHandle_t q = (QueueHandle_t)arg;
+    QueueHandle_t  q = (QueueHandle_t)arg;
     button_event_t evt;
     while (1) {
         if (xQueueReceive(q, &evt, portMAX_DELAY) == pdTRUE) {
@@ -276,7 +274,10 @@ void menu_run_task(QueueHandle_t q, UBaseType_t priority)
     xTaskCreate(menu_run_task_fn, "menu", 4096, (void *)q, priority, NULL);
 }
 
-void menu_redraw(void) { render(); }
+void menu_redraw(void)
+{
+    render();
+}
 
 void menu_toast(const char *msg, int duration_ms)
 {

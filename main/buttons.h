@@ -23,7 +23,7 @@ typedef struct {
 } button_event_t;
 
 typedef struct {
-    int pins[BTN_COUNT];      // GPIO numbers for BACK, ENTER, FORWARD
+    int pins[BTN_COUNT]; // GPIO numbers for BACK, ENTER, FORWARD
     int debounce_ms;
     int long_press_ms;
     int repeat_interval_ms;

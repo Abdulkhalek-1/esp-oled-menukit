@@ -1,9 +1,10 @@
 #pragma once
 
+#include "buttons.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "buttons.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/task.h"
@@ -17,9 +18,9 @@ typedef enum {
 typedef struct menu_s menu_t;
 
 typedef struct {
-    menu_item_kind_t   kind;
-    const char        *label;
-    const uint8_t     *icon;
+    menu_item_kind_t kind;
+    const char      *label;
+    const uint8_t   *icon;
     union {
         void (*action)(void *user_ctx);
         const menu_t *submenu;
@@ -30,11 +31,11 @@ typedef enum { MENU_LAYOUT_LIST, MENU_LAYOUT_ICONS } menu_layout_t;
 typedef enum { MENU_SEL_INVERT, MENU_SEL_ARROW, MENU_SEL_BORDER } menu_selection_t;
 
 typedef struct {
-    int                icon_w;
-    int                icon_h;
-    int                row_height;
-    int                title_height;
-    menu_selection_t   selection;
+    int              icon_w;
+    int              icon_h;
+    int              row_height;
+    int              title_height;
+    menu_selection_t selection;
 } menu_style_t;
 
 struct menu_s {
@@ -44,7 +45,7 @@ struct menu_s {
     const menu_style_t *style;
 };
 
-#define MENU_END { .kind = MENU_ITEM_END }
+#define MENU_END {.kind = MENU_ITEM_END}
 
 void menu_init(const menu_t *root, void *user_ctx);
 void menu_handle_event(button_event_t evt);

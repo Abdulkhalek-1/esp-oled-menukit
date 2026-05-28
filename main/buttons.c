@@ -1,10 +1,11 @@
 #include "buttons.h"
 
+#include "esp_log.h"
+
 #include <stdbool.h>
 #include <string.h>
 
 #include "driver/gpio.h"
-#include "esp_log.h"
 #include "freertos/task.h"
 
 static const char *TAG = "buttons";
@@ -17,23 +18,23 @@ static QueueHandle_t    s_queue;
 #define POLL_INTERVAL_MS 10
 
 typedef enum {
-    ST_IDLE,            // pin high, waiting for press
-    ST_DEBOUNCE_PRESS,  // pin low, counting samples toward debounce_ms
-    ST_PRESSED,         // press confirmed
-    ST_LONG_HELD,       // long-press fired; repeats will come in Task 4
-    ST_DEBOUNCE_REL,    // pin high, counting samples toward debounce_ms
+    ST_IDLE,           // pin high, waiting for press
+    ST_DEBOUNCE_PRESS, // pin low, counting samples toward debounce_ms
+    ST_PRESSED,        // press confirmed
+    ST_LONG_HELD,      // long-press fired; repeats will come in Task 4
+    ST_DEBOUNCE_REL,   // pin high, counting samples toward debounce_ms
 } btn_state_t;
 
 typedef struct {
     btn_state_t state;
-    int         ms_in_state;   // milliseconds spent in current state
+    int         ms_in_state; // milliseconds spent in current state
 } per_btn_t;
 
 static per_btn_t s_state[BTN_COUNT];
 
-static void emit(button_id_t b, button_event_type_t ev)
+static void      emit(button_id_t b, button_event_type_t ev)
 {
-    button_event_t evt = { .button = b, .event = ev };
+    button_event_t evt = {.button = b, .event = ev};
     if (xQueueSendToBack(s_queue, &evt, 0) != pdTRUE) {
         ESP_LOGW(TAG, "queue full, dropped event b=%d ev=%d", b, ev);
     }
@@ -44,40 +45,40 @@ static void buttons_task(void *arg)
     (void)arg;
     while (1) {
         for (int b = 0; b < BTN_COUNT; b++) {
-            bool low = gpio_get_level(s_cfg.pins[b]) == 0;  // active-low
-            per_btn_t *st = &s_state[b];
+            bool       low = gpio_get_level(s_cfg.pins[b]) == 0; // active-low
+            per_btn_t *st  = &s_state[b];
             st->ms_in_state += POLL_INTERVAL_MS;
 
             switch (st->state) {
             case ST_IDLE:
                 if (low) {
-                    st->state = ST_DEBOUNCE_PRESS;
+                    st->state       = ST_DEBOUNCE_PRESS;
                     st->ms_in_state = 0;
                 }
                 break;
             case ST_DEBOUNCE_PRESS:
                 if (!low) {
-                    st->state = ST_IDLE;
+                    st->state       = ST_IDLE;
                     st->ms_in_state = 0;
                 } else if (st->ms_in_state >= s_cfg.debounce_ms) {
                     emit((button_id_t)b, BTN_EVT_PRESSED);
-                    st->state = ST_PRESSED;
+                    st->state       = ST_PRESSED;
                     st->ms_in_state = 0;
                 }
                 break;
             case ST_PRESSED:
                 if (!low) {
-                    st->state = ST_DEBOUNCE_REL;
+                    st->state       = ST_DEBOUNCE_REL;
                     st->ms_in_state = 0;
                 } else if (st->ms_in_state >= s_cfg.long_press_ms) {
                     emit((button_id_t)b, BTN_EVT_LONG_PRESS);
-                    st->state = ST_LONG_HELD;
+                    st->state       = ST_LONG_HELD;
                     st->ms_in_state = 0;
                 }
                 break;
             case ST_LONG_HELD:
                 if (!low) {
-                    st->state = ST_DEBOUNCE_REL;
+                    st->state       = ST_DEBOUNCE_REL;
                     st->ms_in_state = 0;
                 } else if (st->ms_in_state >= s_cfg.repeat_interval_ms) {
                     emit((button_id_t)b, BTN_EVT_REPEAT);
@@ -86,11 +87,11 @@ static void buttons_task(void *arg)
                 break;
             case ST_DEBOUNCE_REL:
                 if (low) {
-                    st->state = ST_PRESSED;
+                    st->state       = ST_PRESSED;
                     st->ms_in_state = 0;
                 } else if (st->ms_in_state >= s_cfg.debounce_ms) {
                     emit((button_id_t)b, BTN_EVT_RELEASED);
-                    st->state = ST_IDLE;
+                    st->state       = ST_IDLE;
                     st->ms_in_state = 0;
                 }
                 break;
@@ -133,12 +134,11 @@ QueueHandle_t buttons_init(const buttons_config_t *cfg)
     }
 
     for (int i = 0; i < BTN_COUNT; i++) {
-        s_state[i].state = ST_IDLE;
+        s_state[i].state       = ST_IDLE;
         s_state[i].ms_in_state = 0;
     }
 
-    BaseType_t ok = xTaskCreate(buttons_task, "buttons", 3072, NULL,
-                                tskIDLE_PRIORITY + 1, NULL);
+    BaseType_t ok = xTaskCreate(buttons_task, "buttons", 3072, NULL, tskIDLE_PRIORITY + 1, NULL);
     if (ok != pdPASS) {
         ESP_LOGE(TAG, "xTaskCreate failed");
         vQueueDelete(s_queue);
@@ -146,7 +146,7 @@ QueueHandle_t buttons_init(const buttons_config_t *cfg)
         return NULL;
     }
 
-    ESP_LOGI(TAG, "buttons ready on GPIOs %d/%d/%d (BACK/ENTER/FORWARD)",
-             s_cfg.pins[BTN_BACK], s_cfg.pins[BTN_ENTER], s_cfg.pins[BTN_FORWARD]);
+    ESP_LOGI(TAG, "buttons ready on GPIOs %d/%d/%d (BACK/ENTER/FORWARD)", s_cfg.pins[BTN_BACK],
+             s_cfg.pins[BTN_ENTER], s_cfg.pins[BTN_FORWARD]);
     return s_queue;
 }

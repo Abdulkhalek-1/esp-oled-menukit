@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define SH1106_WIDTH  128
+#define SH1106_WIDTH 128
 #define SH1106_HEIGHT 64
 
 void sh1106_init(void);
