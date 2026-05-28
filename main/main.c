@@ -33,9 +33,18 @@ static void consumer_task(void *arg)
 {
     QueueHandle_t q = (QueueHandle_t)arg;
     button_event_t evt;
+    char line[32];
+
     while (1) {
         if (xQueueReceive(q, &evt, portMAX_DELAY) == pdTRUE) {
-            ESP_LOGI(TAG, "%s %s", btn_name(evt.button), evt_name(evt.event));
+            snprintf(line, sizeof(line), "%-5s %-8s",
+                     btn_name(evt.button), evt_name(evt.event));
+            ESP_LOGI(TAG, "%s", line);
+
+            sh1106_clear();
+            sh1106_draw_string(0, 0, "Buttons demo");
+            sh1106_draw_string(0, 16, line);  // row 2 (y=16)
+            sh1106_flush();
         }
     }
 }
