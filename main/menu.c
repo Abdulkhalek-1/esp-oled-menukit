@@ -79,12 +79,23 @@ static int draw_title(const menu_t *m)
     return st->title_height;
 }
 
-static void render_list(const menu_t *m, const frame_t *f)
+static void render_list(const menu_t *m, const frame_t *f_in)
 {
     const menu_style_t *st = style_of(m);
     int n = item_count(m->items);
-    int y = draw_title(m);
-    for (int i = 0; i < n; i++) {
+
+    int y_start = draw_title(m);
+    int visible_rows = (SH1106_HEIGHT - y_start) / st->row_height;
+    if (visible_rows < 1) visible_rows = 1;
+
+    frame_t *f = (frame_t *)f_in;
+    if (f->index < f->scroll_offset)
+        f->scroll_offset = f->index;
+    if (f->index >= f->scroll_offset + visible_rows)
+        f->scroll_offset = f->index - visible_rows + 1;
+
+    int y = y_start;
+    for (int i = f->scroll_offset; i < n && i < f->scroll_offset + visible_rows; i++) {
         bool selected = (i == f->index);
         if (selected && st->selection == MENU_SEL_INVERT) {
             invert_rect(0, y, SH1106_WIDTH, st->row_height);
