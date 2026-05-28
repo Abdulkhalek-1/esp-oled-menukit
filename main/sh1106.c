@@ -11,8 +11,8 @@
 // Wiring — ESP32 DevKitC, HSPI bus.
 #define PIN_SCK   15
 #define PIN_MOSI  2
-#define PIN_CS    18
-#define PIN_DC    5
+#define PIN_CS     5
+#define PIN_DC    18
 #define PIN_RES   4
 
 #define SH1106_PAGES         (SH1106_HEIGHT / 8)   // 8 pages of 8 rows each.
@@ -100,4 +100,12 @@ void sh1106_init(void)
 
 void sh1106_clear(void) { memset(framebuffer, 0, sizeof(framebuffer)); }
 void sh1106_set_pixel(int x, int y, bool on) { (void)x; (void)y; (void)on; }
-void sh1106_flush(void) {}
+void sh1106_flush(void)
+{
+    for (uint8_t page = 0; page < SH1106_PAGES; page++) {
+        sh1106_cmd(0xB0 | page);                              // set page address (0xB0-0xB7)
+        sh1106_cmd(0x00 | (SH1106_COL_OFFSET & 0x0F));        // lower column nibble  = 2
+        sh1106_cmd(0x10 | ((SH1106_COL_OFFSET >> 4) & 0x0F)); // higher column nibble = 0
+        sh1106_data(&framebuffer[page * SH1106_WIDTH], SH1106_WIDTH);
+    }
+}
