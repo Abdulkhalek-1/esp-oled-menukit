@@ -1,4 +1,5 @@
 #include "buttons.h"
+#include "icons.h"
 #include "menu.h"
 #include "sh1106.h"
 
@@ -46,13 +47,20 @@ static const menu_t settings_menu = {
 };
 
 static const menu_item_t home_items[] = {
-    { .kind = MENU_ITEM_SUBMENU, .label = "Settings",  .u.submenu = &settings_menu },
-    { .kind = MENU_ITEM_SUBMENU, .label = "Long List", .u.submenu = &long_menu },
-    { .kind = MENU_ITEM_ACTION,  .label = "About",     .u.action = act_about },
+    { .kind = MENU_ITEM_SUBMENU, .label = "Settings",  .icon = icon_settings,
+      .u.submenu = &settings_menu },
+    { .kind = MENU_ITEM_SUBMENU, .label = "Long List", .icon = icon_wifi,
+      .u.submenu = &long_menu },
+    { .kind = MENU_ITEM_ACTION,  .label = "About",     .icon = icon_bluetooth,
+      .u.action = act_about },
     MENU_END,
 };
+static const menu_style_t home_style = {
+    .icon_w = 32, .icon_h = 32, .row_height = 10, .title_height = 10,
+    .selection = MENU_SEL_BORDER,
+};
 static const menu_t home = {
-    .title = "Home", .layout = MENU_LAYOUT_LIST, .items = home_items, .style = NULL,
+    .title = "Home", .layout = MENU_LAYOUT_ICONS, .items = home_items, .style = &home_style,
 };
 
 void app_main(void)

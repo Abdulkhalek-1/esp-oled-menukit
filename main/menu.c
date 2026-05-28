@@ -143,6 +143,52 @@ static void render_list(const menu_t *m, const frame_t *f_in)
     }
 }
 
+static void render_icons(const menu_t *m, const frame_t *f)
+{
+    const menu_style_t *st = style_of(m);
+    int n = item_count(m->items);
+
+    int y_top = 0;
+    if (m->title) y_top = draw_title(m);
+
+    int total_w = n * st->icon_w;
+    int gap     = (SH1106_WIDTH - total_w) / (n + 1);
+    if (gap < 0) gap = 0;
+
+    int label_h = 9;
+    int icons_h = SH1106_HEIGHT - y_top - label_h;
+    int icon_y  = y_top + (icons_h - st->icon_h) / 2;
+    if (icon_y < y_top) icon_y = y_top;
+
+    for (int i = 0; i < n; i++) {
+        int icon_x = gap + i * (st->icon_w + gap);
+        render_icon(icon_x, icon_y, m->items[i].icon, st->icon_w, st->icon_h);
+
+        if (i == f->index) {
+            if (st->selection == MENU_SEL_INVERT) {
+                draw_rect(icon_x - 1, icon_y - 1, st->icon_w + 2, st->icon_h + 2);
+            } else if (st->selection == MENU_SEL_BORDER) {
+                draw_rect(icon_x - 2, icon_y - 2, st->icon_w + 4, st->icon_h + 4);
+            } else if (st->selection == MENU_SEL_ARROW) {
+                int tx = icon_x + st->icon_w / 2;
+                int ty = icon_y + st->icon_h + 1;
+                for (int dy = 0; dy < 3; dy++) {
+                    for (int dx = -dy; dx <= dy; dx++) {
+                        sh1106_set_pixel(tx + dx, ty + dy, true);
+                    }
+                }
+            }
+        }
+    }
+
+    const char *label = m->items[f->index].label;
+    if (label) {
+        int label_x = (SH1106_WIDTH - (int)strlen(label) * 8) / 2;
+        if (label_x < 0) label_x = 0;
+        sh1106_draw_string(label_x, SH1106_HEIGHT - 8, label);
+    }
+}
+
 static void render(void)
 {
     if (s_depth == 0) return;
@@ -150,6 +196,8 @@ static void render(void)
     const frame_t *f = &s_stack[s_depth - 1];
     if (f->menu->layout == MENU_LAYOUT_LIST) {
         render_list(f->menu, f);
+    } else if (f->menu->layout == MENU_LAYOUT_ICONS) {
+        render_icons(f->menu, f);
     }
     sh1106_flush();
 }
@@ -162,14 +210,6 @@ void menu_init(const menu_t *root, void *user_ctx)
     s_stack[0].index         = 0;
     s_stack[0].scroll_offset = 0;
     ESP_LOGI(TAG, "menu_init: root=%p", root);
-
-    // Task 9 smoke test for render_icon — remove in Task 10.
-    extern const uint8_t icon_test[128];
-    sh1106_clear();
-    render_icon(48, 16, icon_test, 32, 32);
-    sh1106_flush();
-    vTaskDelay(pdMS_TO_TICKS(1500));
-
     render();
 }
 
