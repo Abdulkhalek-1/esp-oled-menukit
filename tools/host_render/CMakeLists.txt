@@ -9,8 +9,10 @@ set(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 
 add_library(render_core STATIC
     sh1106_host.c
+    scenes.c
     ${REPO_ROOT}/components/font8x8/src/font8x8.c
     ${REPO_ROOT}/components/menu/src/menu.c
+    ${REPO_ROOT}/main/icons.c
 )
 
 target_include_directories(render_core PUBLIC
@@ -20,4 +22,5 @@ target_include_directories(render_core PUBLIC
     ${REPO_ROOT}/components/menu/include
     ${REPO_ROOT}/components/buttons/include
     ${REPO_ROOT}/components/font8x8/include
+    ${REPO_ROOT}/main
 )
