@@ -80,3 +80,6 @@ Desktop.ini
 # IDE config containing host-specific paths
 .vscode/settings.json
 .vscode/c_cpp_properties.json
+
+# Host-side render harness intermediates (PNGs are committed in docs/img/)
+docs/img/*.pgm

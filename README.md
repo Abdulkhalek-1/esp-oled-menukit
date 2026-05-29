@@ -12,6 +12,19 @@ Built as a set of independent ESP-IDF components, plus a working demo.
 | [buttons](components/buttons/README.md)              | Debounced 3-button library with PRESSED/RELEASED/LONG_PRESS/REPEAT events on a FreeRTOS queue.     | `buttons_init`                                                    |
 | [menu](components/menu/README.md)                    | Recursive data-driven menu engine — two layouts, three selection styles, scrolling, toasts.        | `menu_init / handle_event / run_task / toast / redraw`            |
 
+## Screens
+
+Rendered by [`tools/host_render/`](tools/host_render/) — the actual firmware
+menu code drawing into a host-side framebuffer, not a photo or mockup.
+
+![Home — icon row, BORDER selection](docs/img/home-icons.png)
+![Settings — text list, BORDER selection](docs/img/settings-list.png)
+![WiFi — text list, INVERT selection (default)](docs/img/wifi-invert.png)
+![About — text list, ARROW selection](docs/img/about-arrow.png)
+![Toast notification on Settings](docs/img/toast.png)
+
+Regenerate any time the menu code changes: `cd tools/host_render && make`.
+
 ## Hardware
 
 ESP32 DevKitC / WROOM-32 + 1.3" SH1106 SPI OLED + three momentary push buttons.
