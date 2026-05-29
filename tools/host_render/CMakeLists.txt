@@ -24,3 +24,6 @@ target_include_directories(render_core PUBLIC
     ${REPO_ROOT}/components/font8x8/include
     ${REPO_ROOT}/main
 )
+
+add_executable(render render.c)
+target_link_libraries(render PRIVATE render_core)
